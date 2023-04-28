@@ -1,0 +1,24 @@
+create table taxidata(tf string);
+LOAD DATA INPATH '/user/maria_dev/wholeEnchilada.csv' OVERWRITE INTO TABLE taxidata;
+CREATE TABLE airporttaxi (
+  UniqueCarrier STRING,
+  Origin STRING,
+  TaxiIn INT,
+  TaxiOut INT
+);
+
+INSERT OVERWRITE TABLE airporttaxi
+SELECT 
+  regexp_extract(tf, '^(?:([^,]*),?){9}', 1) AS UniqueCarrier,
+  regexp_extract(tf, '^(?:([^,]*),?){17}', 1) AS Origin,
+  regexp_extract(tf, '^(?:([^,]*),?){20}', 1) AS TaxiIn,
+  regexp_extract(tf, '^(?:([^,]*),?){21}', 1) AS TaxiOut
+FROM taxidata
+WHERE tf <> 'NA';
+
+SELECT 
+  CONCAT(UniqueCarrier, '-', Origin) AS airline_origin, 
+  CAST(MIN(TaxiIn + TaxiOut) AS FLOAT) AS min_taxi, 
+  CAST (MAX(TaxiIn + TaxiOut) AS FLOAT) AS max_taxi, 
+  CAST (AVG(TaxiOut + TaxiIn) AS FLOAT) AS avg_taxi
+FROM airporttaxi GROUP BY CONCAT(UniqueCarrier, '-', Origin);

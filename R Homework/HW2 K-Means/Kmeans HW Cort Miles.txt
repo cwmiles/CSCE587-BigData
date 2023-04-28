@@ -1,0 +1,25 @@
+### CSCE 587 Kmeans HW
+### Cort Miles
+### 02/23/23
+
+
+PART 0:
+
+1) Qualitative and non numerical data cant be used since a distance cant be tracked as its not numberical.
+
+2) No, K-means isnt deterministic because each run through of the data and the value of k set, could
+   potentially cause different clusters and different centroid guesses.
+
+PART 1:
+
+9) By comparing the WSS plots before and after normalizing the data, it can be 
+   seen that the best value of K changes from 5 to 4 (convergence in step 7 happens at 
+K = 4). Prior to normalization, at K = 4, the value of WSS is still high but drops 
+significantly afterwards whereas after normalizing the data, this drop happened at 
+K = 4. Therefore, we can deduce that normalization aids the optimization of K.
+
+
+9) Yes, because the value of the withinsumSqr is higher before data normalization and it helps 
+Originally we can say that k should equal 5 for best fit since its right before convergence prior to 
+normalization. After normalization, k's best value is 4 since the withinsumsqr drops after.
+   

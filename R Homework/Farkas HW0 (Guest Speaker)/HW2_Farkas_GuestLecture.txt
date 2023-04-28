@@ -1,0 +1,30 @@
+ ---- Cort Miles
+---- 2/14/23
+---- CSCE 587 
+
+---- HOMEWORK 2 (Farkas-Guest Lecture)
+
+
+1: For one, large volumes of data are difficult to support because of the amount of memory/ storage space
+needed. In addition, RDBMS are best at taking in a steady flow of data, but its harder to grow the data. Also, 
+sorting the data can be particularly difficult depending on what is collected.
+
+2: NoSQL databases have grown increasingly popular despite it not supporting ACID properties due to the fact 
+NoSQL databases can scale out very quickly, can handle high traffic, and allow more customized database.
+
+Using the Hive database that you built during the Hive lab lecture, write the queries to compute the followings.  
+Return the answers as csv files for each query:
+
+a.Query 1: return the name, location, and the wageplan of the driver with driver Id 10
+b.Query 2: return the Id of the drivers who logged more than 70 hours at any week.
+(Note: use SELECT DISTINCT instead of SELECT to eliminate duplicate occurrences of the same driverId.)
+c.Query 3: return the driver’s Id and name of each driver and the driver’s miles per hours ratio.  
+
+3a: select name, location, wageplan from drivers where driverid = 10;
+
+3b: select distinct driverid from timesheet where hours_logged > 70; 
+
+3c: select d.driverid, d.name, t.mph from drivers d
+	join (select driverid, ceiling(sum(miles_logged)/sum(hours_logged)) mph from timesheet Group by driverid) t
+	on (d.driverid=t.driverid);
+

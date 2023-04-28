@@ -1,0 +1,49 @@
+### Cort Miles
+### Lin-Log HW
+### CSCE 587
+
+1a) plot(gold_target1$V1~gold_target1$V2)
+
+1b) r = lm(gold_target1$V1~gold_target1$V2)
+    str(r)
+
+1c) par(mfrow=c(2,2))
+    plot(r)
+
+e. Do the residuals have the property of homoscedasticity? Explain!
+
+1d) This tells us that the beggining values where residuals are between -5 and 5 there is  
+    a good fit, however there are some 'outliers' that have a high variance (being far 
+    away from the red line) which shows that the fit isnt perfect and probably could be 
+    better.
+
+1e) No the the residuals do not have the property of homoscedasticity because the variance 
+    isnt the same (or even similar) for all the points as there are significant outliers 
+    such as #58, #63, #64 in the top left graph. If the fit line was more accurate and 
+    there was a solid trend where the variance across the data was more similar then it 
+    would have the property of homoscedasticity.
+
+1f) ypred = predict(r)
+    par(mfrow=c(1,1))
+    plot(gold_target1$V1,gold_target1$V1,type='l',xlab="observed y",ylab="predicted y")
+    points(gold_target1$V1,ypred)
+
+2a) plot(gold_target1$V4~gold_target1$V1)
+
+2b) plot(gold_target1$V4~gold_target1$V2)
+
+2c) glm.out = glm(V4~V2, family=binomial(logit), data=gold_target1)
+
+2d) plot(gold_target1$V4~gold_target1$V2)
+    lines(gold_target1$V2,glm.out$fitted,type="l", col="red")
+    ### NOTE - I had to change lrm1 to glm.out as lrm1 wasnt recognized
+
+2e) glm.out = glm(V4~V1+V2, family=binomial(logit), data=gold_target1)
+
+2f) summary(glm.out) 
+    ###NOTE - Need to write glm.out again and then summary(glm.out) for part 2c as well
+    The estimate coefficient of gold_target$V2 in step 2c is 1.7606 with a z-val of 3.606 and significance code of *** which is 0.001  
+    The estimate coefficient of gold_target$V2 in step 2e is 0.9235 with a z-val of 2.059 and significance code of *** which is 0.05
+    In these two the confidence went up in 2e, which means the relationship doesnt have to be as strong to still be 'confident' in the value. 
+
+3) (1/4)/(1-1/4) = (1/4)/(3/4) = 1/3 = 0.333333

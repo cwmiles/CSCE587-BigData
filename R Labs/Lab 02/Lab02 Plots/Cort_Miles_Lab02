@@ -1,0 +1,35 @@
+library("arules", lib.loc="~/R/x86_64-redhat-linux-gnu-library/3.5")
+library("arulesViz", lib.loc="~/R/x86_64-redhat-linux-gnu-library/3.5")
+data("Groceries")
+Groceries
+summary(Groceries)
+image(Groceries)
+image(Groceries[1:200,])
+rules <- apriori(Groceries,parameter=list(support=0.001, confidence=0.5))
+----> There was a total of 5668 rules
+inspect(rules)
+plot(rules)
+plot(rules, shading="order", control=list(main="Two-key plot"))
+----> Fewer Rules doesn't always mean better
+inspect(rules[1:20])
+inspect(head(sort(rules, by="lift"),5))
+rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.8))
+plot(head(sort(rules, by="lift"),500),method="grouped")
+plot(head(sort(rules, by="lift"),50),method="grouped")
+----> When comparing the two plots above, the plot with less groups had less light spots. Basically, the 
+----- the plot with 500 has more light shaded circles/ spots which means more low lift points.
+data(Epub)
+Epub
+summary(Epub)
+image(Epub)
+image(Epub[1:1000,])
+rules2 <- apriori(Epub)
+----> O rules were generated bcus default values were too large and dont fit the data
+rules2 <- apriori(Epub, parameter=list(support=0.001,confidence=0.5))
+rules2 <- apriori(Epub, parameter=list(support=0.01,confidence=0.5))
+inspect(rules2)
+inspect(head(sort(rules2,by="lift"),10))
+plot(rules2)
+plot(rules2, shading="order",control=list(main="Two-key plot"))
+plot(head(sort(rules2,by="lift"),50),method="grouped")
+

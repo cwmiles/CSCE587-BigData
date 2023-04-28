@@ -1,0 +1,130 @@
+### CSCE 587 
+### Cort Miles
+### Decision Tree HW
+
+------------------------------------------------------------------------
+                             -Part 1 Below-
+------------------------------------------------------------------------
+1. titanic_train$Survived <- as.factor(titanic_train$Survived)
+
+2. titsub <- subset(titanic_train, select=c('Survived','Pclass','Sex','Age','SibSp','Parch'))
+
+3a. set.seed(587)
+
+3b. which(titsub$Survived == 1) 
+    which(titsub$Survived == 0)
+
+3c. class0 = array(sample(which(titsub$Survived==0),549),c(9,61))
+    class1 = array(sample(which(titsub$Survived==1),342),c(9,38))
+
+
+------------------------------------------------------------------------
+                             -Part 2 Below-
+------------------------------------------------------------------------
+
+####0) 
+for (i in 1:6)
+{
+	if(i == 1)
+	{
+	cpval <- 0.008
+	print(sprintf("cpval is",cpval, fmt='%s %#.5f'))
+	}
+	else
+	{
+	cpval <- cpval/2
+	print(sprintf("cpval is",cpval, fmt='%s %#.5f'))
+	}
+
+####1)
+	for (i in 1:9)
+{
+      # the indices for the ith test partition
+      test_indices = c(class0[i,],class1[i,])
+
+      # the ith test partion
+      test_partition = titsub[test_indices,] 
+
+      # the ith training parition
+      train_partition = titsub[-test_indices,] 
+
+      # train the ith tree model
+      m <- rpart( Survived ~ Pclass + Sex + Age + SibSp +Parch, data =train_partition, 	method="class", control=rpart.control(minsplit=2,cp=cpval))
+
+      # aggregate the results from the 10 models
+      if (i==1) confMat = table(predict(m, test_partition[,2:6], type= 'class'), 	test_partition[,1])
+      else confMat = confMat + table(predict(m, test_partition[,2:6], type='class'), 	test_partition[,1])
+}
+
+####2)
+print(sprintf("Step 2: The sensitivity on the test partitions is",sensitivity(confMat)*100,fmt='%s %#.2f'))
+print(sprintf("Step 2: The specificity on the test partitions is",specificity(confMat)*100,fmt='%s %#.2f'))
+
+####3)
+	for (i in 1:9)
+{
+      # the indices for the ith test partition
+      test_indices = c(class0[i,],class1[i,])
+
+      # the ith test partion
+       test_partition = titsub[test_indices,] 
+
+      # the ith training parition
+       train_partition = titsub[-test_indices,] 
+
+      # train the ith model
+       m <- rpart( Survived ~ Pclass + Sex + Age + SibSp +Parch, data =train_partition, 		 method="class", control=rpart.control(minsplit=2,cp=cpval))
+
+      # aggregate the results from the 10 models
+	if (i==1) confMat = table(predict(m, train_partition[,2:6], type= 'class'), 	train_partition[,1])
+      else confMat = confMat + table(predict(m, train_partition[,2:6], type='class'), 	train_partition[,1])
+
+}
+
+####4)
+print(sprintf("Step 4: The sensitivity on the training partitions is",sensitivity(confMat)*100,fmt='%s %#.2f'))
+print(sprintf("Step 4: The specificity on the training partitions is",specificity(confMat)*100,fmt='%s %#.2f'))
+
+####5)
+}
+
+
+####6) ADDRESSING SENS AND SPEC VALUES BELOW and Data print given from steps 
+
+Given by the results below, we can tell that the sensitivity across all cpvals increased on step 4 in comparison to step 2, with the gap between them, getting larger as the cpval decreases which grows from 2->11 as the cpval decreases. This is the same as they get tighter/ closer as cpval increases.
+In addition, we can also see that the higher the cpval, that sensitivity values are closer together across steps 2 and 4, whereas with a lower cpval, the sensitivity value gap is close to 14.
+
+
+"cpval is 0.00800"
+[1] "Step 2: The sensitivity on the test partitions is 88.34"
+[1] "Step 2: The specificity on the test partitions is 67.84"
+[1] "Step 4: The sensitivity on the training partitions is 90.71"
+[1] "Step 4: The specificity on the training partitions is 71.42"
+[1] "cpval is 0.00400"
+[1] "Step 2: The sensitivity on the test partitions is 89.07"
+[1] "Step 2: The specificity on the test partitions is 66.67"
+[1] "Step 4: The sensitivity on the training partitions is 92.51"
+[1] "Step 4: The specificity on the training partitions is 75.62"
+[1] "cpval is 0.00200"
+[1] "Step 2: The sensitivity on the test partitions is 87.61"
+[1] "Step 2: The specificity on the test partitions is 69.88"
+[1] "Step 4: The sensitivity on the training partitions is 93.65"
+[1] "Step 4: The specificity on the training partitions is 80.12"
+[1] "cpval is 0.00100"
+[1] "Step 2: The sensitivity on the test partitions is 86.34"
+[1] "Step 2: The specificity on the test partitions is 69.59"
+[1] "Step 4: The sensitivity on the training partitions is 96.04"
+[1] "Step 4: The specificity on the training partitions is 83.44"
+[1] "cpval is 0.00050"
+[1] "Step 2: The sensitivity on the test partitions is 85.61"
+[1] "Step 2: The specificity on the test partitions is 70.18"
+[1] "Step 4: The sensitivity on the training partitions is 96.15"
+[1] "Step 4: The specificity on the training partitions is 84.61"
+[1] "cpval is 0.00025"
+[1] "Step 2: The sensitivity on the test partitions is 85.61"
+[1] "Step 2: The specificity on the test partitions is 70.18"
+[1] "Step 4: The sensitivity on the training partitions is 96.15"
+[1] "Step 4: The specificity on the training partitions is 84.61"
+ 
+
+

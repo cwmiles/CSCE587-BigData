@@ -1,0 +1,5 @@
+# Report for Map Reduce
+
+The results I found show that there are months that experience larger departure days regardless of weather. I think an easy example could be testing dates that are close to holidays for travel and then crossing check based of the weather across multiple years to show weather does or doesnt play a role. Other factors could be economic, if middle class individuals dont have the funds. 
+
+In order to check this and make a hypothesis test, lets use a two sample test and pick two months and calculate their means. They would also need to be independent and independently sampled, however they need to have the same sample size and the same variance. Then we can look at the t val to see if we reject or accept the hypthothesis.

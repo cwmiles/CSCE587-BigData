@@ -1,0 +1,75 @@
+###CSCE 587
+###Cort Miles
+###Hadoop HW
+
+#Below are steps I took in case of recreation
+
+#1 Average Dep Delay using hadoop
+
+- make mapper (download example and modify) - ensure its saved as a py file
+- log into ambari port 8080 and upload the file to maria dev
+- go into sandbox and transfer the file.
+	hadoop fs -get aveDepDelayByMonthMapper.py
+- test mapper by doing these steps:
+	- grab test set of data
+	-  wget https://cse.sc.edu/~rose/587/CSV/testNA.csv
+	-  execute the mapper with this test dataset
+	- python aveDepDelayByMonthMapper.py < testNA.csv
+- do the same as above and make reducer
+- transfer the file using hadoop fs -get
+- output of mapper to test reducer.
+	- python aveDepDelayByMonthMapper.py < testNA.csv > aveDepDelayByMonthMapperOutput
+- sort the output of mapper
+	- sort <aveDepDelayByMonthOutput >aveDepDelayByMonthOutputSorted
+- now use the reducer
+	- python aveDepDelayByMonthReducer.py < exampleMapperOutputSorted
+
+- now since tested, download input data and name output files as required below:
+# wget file 
+# hadoop fs -put 2008.csv
+
+# command to invoke aveDepDelayByMonth map-reduce 
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./TaxiMapper2.py -mapper 'python TaxiMapper2.py' -file ./TaxiReducer4.py -reducer 'python TaxiReducer4.py' -input /user/maria_dev/wholeEnchilada.csv -output /user/maria_dev/TaxiMapReduceResults
+
+- check our changes abnd look at our files
+	- hadoop fs -ls
+
+- fetch our results
+  	- hadoop fs -cat aveDepDelayByMonthMapReduceResults/part-00000
+
+
+
+#2 Pig Latin aveDepDelayByMonth
+- develop pig latin script
+- go onto sandbox and initiate pig environment w grunt
+- enter line by line:
+	flights = load '2008.csv' using PigStorage(',');
+	flight_details = FOREACH flights GENERATE $1 as month, (int)$15 AS depDelay;
+	grp_month = GROUP flight_details by month;
+	aveDepDelay= foreach grp_month generate group, AVG(flight_details.depDelay);
+	store aveDepDelay into 'aveDepDelayByMonthPigResults';
+- look at results
+	- ls aveDepDelayByMonthPigResults
+- fetch the results
+	- cat aveDepDelayByMonthPigResults/part-v001-r-00000
+- go to ambari and download results
+
+
+
+#3 HiveQL
+- create the HiveQL script to run 
+- go into ambari and select hive 2.0 view from the icon list
+- Now run the following script in given code segments:
+	---
+	create table temp_flights(tf string);
+	LOAD DATA INPATH '/user/maria_dev/2008.csv' OVERWRITE INTO TABLE temp_flights;
+	---
+	CREATE TABLE flightshw (month STRING, depDelay STRING);
+	insert overwrite table flightshw
+	SELECT 
+	     regexp_extract(tf, '^(?:([^,]*),?){2}', 1) month,
+	     regexp_extract(tf, '^(?:([^,]*),?){16}', 1) depDelay
+	from temp_flights;
+	---
+	SELECT month, sum(depDelay)/count(depDelay) FROM flightshw where depDelay != 'NA' GROUP BY month;
+

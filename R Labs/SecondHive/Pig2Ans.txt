@@ -1,0 +1,104 @@
+### Cort Miles
+### Pig Lab 2
+### CSCE 355
+
+#slide 32
+#slide 41
+
+#download and store files
+wget https://cse.sc.edu/~rose/587/CSV/test_25K.csv --no-check-certificate         
+wget https://cse.sc.edu/~rose/587/CSV/testNA.csv --no-check-certificate    
+wget https://cse.sc.edu/~rose/587/CSV/testDataNoHdr.csv --no-check-certificate
+
+hadoop fs -put test_25K.csv  
+hadoop fs -put testNA.csv
+hadoop fs -put testDataNoHdr.csv
+
+#Get map reduce 
+wget https://cse.sc.edu/~rose/587/python/countMapper.py --no-check-certificate
+wget https://cse.sc.edu/~rose/587/python/countReducer.py --no-check-certificate 
+
+#Hadoop Command
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./countMapper.py -mapper 'python countMapper.py' -file ./countReducer.py -reducer 'python countReducer.py' -input /user/maria_dev/testDataNoHdr.csv -output /user/maria_dev/CountAirlines
+
+#Check for changes
+hadoop fs -ls /user/maria_dev  
+
+#Fetch Results
+hadoop fs -cat CountAirlines/part-00000
+
+#Hadoop Comamand for test25k
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./countMapper.py -mapper 'python countMapper.py' -file ./countReducer.py -reducer 'python countReducer.py' -input /user/maria_dev/test_25K.csv -output /user/maria_dev/CountAirlines_25K
+
+#Fetch Results
+hadoop fs -cat CountAirlines_25K/part-00000  
+
+#Download AveArr
+wget https://cse.sc.edu/~rose/587/python/aveArrDelayMapper.py --no-check-certificate 
+wget https://cse.sc.edu/~rose/587/python/aveArrDelayReducer.py --no-check-certificate                                                                     
+
+#Avrr Delay Command Line Hadoop
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./aveArrDelayMapper.py -mapper 'python aveArrDelayMapper.py' -file ./aveArrDelayReducer.py -reducer 'python aveArrDelayReducer.py' -input /user/maria_dev/testDataNoHdr.csv -output /user/maria_dev/aveArrDelay
+                                                                         
+#Fetch Results
+hadoop fs -cat aveArrDelay/part-00000
+                     
+#Hadoop for 25k test again
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./aveArrDelayMapper.py -mapper 'python aveArrDelayMapper.py' -file ./aveArrDelayReducer.py -reducer 'python aveArrDelayReducer.py' -input /user/maria_dev/test_25K.csv -output /user/maria_dev/aveArrDelay_25K
+
+#Fetch Results 
+hadoop fs -cat aveArrDelay_25K/part-00000
+
+#Pig interative lating program
+flights = load 'test_25K.csv' using PigStorage(',');
+flight_details = FOREACH flights GENERATE $8 AS airline;
+grp_airline = GROUP flight_details by airline;
+airline_count = foreach grp_airline generate group, COUNT(flight_details);
+store airline_count into 'Pig_airline_count';
+
+#Peek into the directory
+ls Pig_airline_count
+
+#Fetch Results
+cat Pig_airline_count/part-v001-o000-r-00000   
+
+#Pig Latin Program Avr delay
+flights = load 'test_25K.csv' using PigStorage(',');
+flight_details = FOREACH flights GENERATE $8 as airline, (int)$14 AS arrDelay;
+grp_airline = GROUP flight_details by airline;
+aveArrDelay= foreach grp_airline generate group, AVG(flight_details.arrDelay);
+store aveArrDelay into 'Pig_airline_AveArrDelay';
+                                                        
+#Peek at it
+ls Pig_airline_AveArrDelay   
+
+#fetch the results
+cat Pig_airline_AveArrDelay/part-v001-o000-r-00000   
+
+#Pull Hive2.0 and then create temp_flights table and load data
+create table temp_flights(tf string);
+LOAD DATA INPATH '/user/maria_dev/test_25K.csv' OVERWRITE INTO TABLE temp_flights;
+
+CREATE TABLE flights (Carrier STRING, arrDelay STRING);
+
+#parse data from flights
+insert overwrite table flights
+SELECT 
+     regexp_extract(tf, '^(?:([^,]*),?){9}', 1) carrier,
+     regexp_extract(tf, '^(?:([^,]*),?){15}', 1) arrDelay
+from temp_flights;
+
+#create answer w select statement
+SELECT carrier, count(arrDelay) FROM flights GROUP BY carrier;
+
+#New Answer 
+SELECT carrier, sum(arrDelay)/count(arrDelay) FROM flights where arrDelay != 'NA' GROUP BY carrier;
+
+
+                                   
+
+
+                                       
+
+
+             

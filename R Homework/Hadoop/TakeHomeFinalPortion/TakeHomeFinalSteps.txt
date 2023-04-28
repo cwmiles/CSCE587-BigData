@@ -1,0 +1,60 @@
+###CSCE 587
+###Cort Miles
+###Hadoop HW
+
+#Below are steps I took in case of recreation
+
+#1 Taxi Reducer using hadoop
+
+- make mapper (download example and modify) - ensure its saved as a py file
+- log into ambari port 8080 and upload the file to maria dev
+    - go to files view and upload and drag n drop.
+- go into sandbox (port 4200) and transfer the file.
+	hadoop fs -get TaxiMapper.py
+- test mapper by doing these steps:
+	- grab test set of data
+	-  wget https://cse.sc.edu/~rose/587/CSV/testNA.csv
+	-  execute the mapper with this test dataset
+	- python TaxiMapper.py < testNA.csv
+- do the same as above and make reducer
+- transfer the file using hadoop fs -get
+- output of mapper to test reducer.
+	- python TaxiMapper.py < testNA.csv > TaxiMapperOutput
+- sort the output of mapper
+	- sort <TaxiMapperOutput >TaxiMapperOutputSorted
+- now use the reducer
+	- python TaxiReducer.py < TaxiMapperOutputSorted
+
+- now since tested, download input data and name output files as required below:
+# wget ALLLLLLL files 200?->8
+# now run the concat file that creates the wholeEnchilada.csv (its in the handout)
+
+# command to invoke aveDepDelayByMonth map-reduce 
+hadoop jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-streaming.jar -file ./TaxiMapper.py -mapper 'python TaxiMapper.py' -file ./TaxiReducer.py -reducer 'python TaxiReducer.py' -input /user/maria_dev/wholeEnchilada.csv -output /user/maria_dev/TaxiMapReduceResults
+
+- check our changes abnd look at our files
+	- hadoop fs -ls
+
+- fetch our results
+  	- hadoop fs -cat TaxiMapReduceResults/part-00000
+
+------------------------------------------------------------------------------------------------------------------
+
+#2 Pig Latin aveDepDelayByMonth
+- develop pig latin script
+- go onto sandbox and initiate pig environment w grunt
+- enter line by line:
+	data = load 'wholeEnchilada.csv' using PigStorage(',');
+	taxiInfo = FOREACH data GENERATE $8 as airline, $16 as origin, (float) $19 as taxiIn, (float) $20 as taxiOut;
+	airorigincat = FOREACH taxiInfo GENERATE CONCAT(airline,'-',origin) AS airlineorigin, (float) taxiIn + taxiOut AS total;
+	key = GROUP airorigincat by airlineorigin;
+	values = FOREACH key GENERATE group, MIN(airorigincat.total) AS minTaxiTimebyAirlineOrigin, MAX(airorigincat.total) AS maxTaxiTimebyAirlineOrigin, AVG(airorigincat.total) AS aveTaxiTimebyAirlineOrigin;
+	store values into 'TaxiPigResultstmp';
+- look at results
+	- ls TaxiPigResultstmp
+- fetch the results and sort them
+	hadoop fs -getmerge TaxiPigResultstmp tmpResults
+	sort < tmpResults > TaxiPigResults
+	hadoop fs -put TaxiPigResults	
+
+

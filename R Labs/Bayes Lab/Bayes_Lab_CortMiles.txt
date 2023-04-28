@@ -1,0 +1,44 @@
+### Naive Bayes Lab
+### Cort Miles
+### CSCE 587
+
+Bayes <- read.csv("~/Bayes.csv")
+View(Bayes)
+traindata <- Bayes[1:14,]
+testdata <- Bayes[15,]
+Pplay <- table(traindata$Play)
+Pplay <- Pplay/sum(Pplay)
+sunny <- table(traindata[,c("Play","Sunny")])
+sunny <- sunny/rowSums(sunny)
+hot<- table(traindata[,c("Play","Hot")])
+hot <- hot/rowSums(hot)
+windy <- table(traindata[,c("Play","Windy")])
+windy <- windy/rowSums(windy)
+Pyes<- sunny["Yes","Yes"] * hot["Yes","No"] * windy["Yes","Yes"]
+Pno<- sunny["No","Yes"] * hot["No","No"] * windy["No","Yes"]
+max(Pyes,Pno)
+# clicked in package to install e1071
+library(e1071)
+m <-naiveBayes(traindata[,1:3],traindata[,4])
+predict(m,testdata[,1:3])
+m <- naiveBayes(iris[,1:4], iris[,5])
+table(predict(m,iris[,1:4]), iris[,5])
+set.seed(123)
+class1 = array(sample(1:50,50), c(10,5))
+class2 = array(sample(51:100,50), c(10,5))
+class3 = array(sample(101:150,50), c(10,5))
+# 10 fold cross validation
+
+for (i in 1:10){
+test_indices = c(class1[i,],class2[i,],class3[i,])
+test_partition = iris[test_indices,]
+train_partition = iris[-test_indices,]
+m <- naiveBayes(train_partition[,1:4], train_partition[,5])
+if (i==1) confMat = table(predict(m, test_partition[,1:4]), test_partition[,5])
+else confMat = confMat + table(predict(m, test_partition[,1:4]), test_partition[,5])
+}
+print(confMat)
+
+# To check results from before cross validation and cross examine with after.
+m <- naiveBayes(iris[,1:4], iris[,5])
+table(predict(m,iris[,1:4]), iris[,5])

@@ -1,0 +1,50 @@
+### Cort Miles
+### CSCE 587 
+### 02/14 && 02/16
+### Linear Regression Lab
+
+The Following is the Code Commandds Entered:
+
+
+set.seed(555)
+x = runif(150,0,50)
+set.seed(555)
+y = 3.142 + x+rnorm(150)*2.5
+plot(y~x)
+m = lm(y~x)
+str(m)
+print(m)
+par(mfrow=c(2,2))
+plot(m)
+ypred= predict(m)
+par(mfrow=c(1,1))
+plot(y,y,type='l',xlab="observed y",ylab="predicted y")
+points(y,ypred)
+summary(m)
+--------------
+IN TERMINAL:
+wget https://cse.sc.edu/~rose/587/CSV/RealEstate.csv --no-check-certificate
+--------------
+Back in Console:
+-> import real estate data then the following:
+plot(RealEstate)
+summary(RealEstate)
+r = lm(RealEstate$Price~RealEstate$Size)
+str(r)
+print(r)
+par(mfrow=c(2,2))
+plot(r)
+ypred = predict(r)
+par(mfrow=c(1,1))
+plot(RealEstate$Price, RealEstate$Price, type="l", xlab="Observed y", ylab="Predicted y")
+points(RealEstate$Price, ypred)
+summary(r)
+
+---------------- FINISHED
+
+
+
+
+
+
+

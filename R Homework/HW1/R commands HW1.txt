@@ -1,0 +1,105 @@
+### Cort Miles 
+##  CSCE 587 HW 1
+
+----------------------------------------------------------------------------------------------------------------
+
+1A)
+
+# Find the index (subset) of players who make at least 5mil
+chosen_ones = which(Kaggle_football_salaries[,'avg_year']>=5000000)
+
+# Assigns them to variable big bucks 
+BigBucks = Kaggle_football_salaries[chosen_ones,]
+
+# Returns how many entries are in the data subset (735 on my acct)
+nrow(BigBucks)
+
+1B)
+
+# Histogram w/ all required detail and a lil extra color
+hist(BigBucks$avg_year/1e06,xlab="Salary in Millions of Dollars",main="Big Buck Salary Analysis", breaks= 14, col = "#993333", border = "#000000")
+
+2)
+# Gets the minimum salary and stores it
+min_salary = min(Kaggle_football_salaries[["avg_year"]])
+
+# Prints the minimum salary
+min_salary
+
+# Finds the subset of players that make the minimum salary of 0
+chosen_ones = which(Kaggle_football_salaries[,'avg_year'] == 0)
+
+# Assigns the players w/ a min salary to Lilbucks
+LilBucks = Kaggle_football_salaries[chosen_ones,]
+
+# Returns how many players make the minimum salary
+nrow(LilBucks)
+
+3)
+
+# Finds the subset of players that make the minimum salary of 0
+chosen_ones = which(Kaggle_football_salaries[,'avg_year'] >= 10000000)
+
+# Assigns the players that make BiggerBucks a.k.a. more than 10 mil
+BiggerBucks = Kaggle_football_salaries[chosen_ones,]
+
+#Returns how many players at least a 10mil salary
+nrow(BiggerBucks) 
+
+4)
+
+# Finds subset of players that play for the Rams
+chosen_ones = which(Kaggle_football_salaries[,'team'] == 'Rams')
+
+# Assigns them to the variable Rams
+Rams = Kaggle_football_salaries[chosen_ones,]
+
+# Finds and assigns then prints total average salary
+total_sal_Rams = sum(Rams$avg_year)
+total_sal_Rams
+
+# Finds and assigns then prints the highest salary of a player on the Rams
+largest_sal_Rams = max(Rams$avg_year)
+largest_sal_Rams
+
+# finds the player of the rams with the highest salary and prints
+high_pay_Rams = which(Rams[,'avg_year'] == largest_sal_Rams)
+high_pay_Rams_names = Rams[high_pay_Rams,]
+high_pay_Rams_names
+
+# finds and assigns then prints the avg salary paid for a rams player
+avg_total_sal_Rams = mean(Rams$avg_year)
+avg_total_sal_Rams
+
+# creates histogram for Rams team salaries
+hist(Rams$avg_year/1e06,xlab="Salary in Millions of Dollars",main="Rams Team Salary Analysis", breaks= 16, col = "#993333", border = "#000000",xlim=c(0,25))
+
+
+--------------------------------------------------------------------
+
+
+# Finds subset of players that play for the Bengals
+chosen_ones = which(Kaggle_football_salaries[,'team'] == 'Bengals')
+
+# Assigns them to the variable Bengals
+Bengals  = Kaggle_football_salaries[chosen_ones,]
+
+# Finds and assigns then prints total average salary
+total_sal_Bengals = sum(Bengals$avg_year)
+total_sal_Bengals
+
+# Finds and assigns then prints the highest salary of a player on the Bengals
+largest_sal_Bengals = max(Bengals$avg_year)
+largest_sal_Bengals
+
+# finds the player of the Bengals with the highest salary and prints
+high_pay_Bengals = which(Bengals[,'avg_year'] == largest_sal_Bengals)
+high_pay_Bengals_names = Bengals[high_pay_Bengals,]
+high_pay_Bengals_names
+
+# finds and assigns then prints the avg salary paid for a Bengals player
+avg_total_sal_Bengals = mean(Bengals$avg_year)
+avg_total_sal_Bengals
+
+# creates histogram for Bengals team salaries
+hist(Bengals$avg_year/1e06,xlab="Salary in Millions of Dollars",main="Bengals Team Salary Analysis", breaks= 12, col = "#993333", border = "#000000",xlim=c(0,25))
